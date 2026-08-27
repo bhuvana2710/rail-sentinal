@@ -1,0 +1,19 @@
+# This is a SNIPPET to merge into the team's shared docker-compose.yml
+# (Person 2 owns the full file — just add this "ml-service" block to it,
+#  alongside the existing "n8n" service.)
+
+services:
+  ml-service:
+    build: ./ml_service          # folder containing Dockerfile, app.py, models/
+    container_name: rail-sentinel-ml
+    ports:
+      - "5000:5000"               # http://localhost:5000/predict from the host machine
+    restart: unless-stopped
+
+  # n8n:
+  #   ... (Person 2's existing n8n block stays as-is)
+  #   Inside n8n's HTTP Request node, call the ML service using the
+  #   DOCKER SERVICE NAME, not localhost:
+  #   http://ml-service:5000/predict
+  #   (Docker Compose gives every service a DNS name equal to its service name,
+  #    so containers can reach each other without knowing IP addresses.)

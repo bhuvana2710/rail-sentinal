@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+*.pyc
+.env
+docker_build_log.txt
