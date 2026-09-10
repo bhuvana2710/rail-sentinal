@@ -1,8 +1,18 @@
-flask==3.1.3
-numpy==2.4.4
-pandas==3.0.2
-scikit-learn==1.8.0
-tensorflow-cpu==2.20.0
-shap==0.52.0
-joblib==1.5.3
-gunicorn==23.0.0
+# Core ML
+numpy>=1.26,<3.0
+pandas>=2.0
+scikit-learn>=1.3
+tensorflow>=2.15,<3.0
+shap>=0.44
+joblib>=1.3
+
+# API
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.5
+
+# Deployment (Colab + ngrok)
+pyngrok>=7.1
+
+# Testing
+requests>=2.31

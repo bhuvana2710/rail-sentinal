@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+colab_deploy.ipynb
+data/
+.git/
+.env
