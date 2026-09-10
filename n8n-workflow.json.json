@@ -1,0 +1,914 @@
+{
+  
+  "name": "Rail-Sentinel — Sensor Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rail-sentinel",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        -160
+      ],
+      "id": "8e2a87e0-1acd-4ed3-afa8-4420a92c8ac4",
+      "name": "Webhook",
+      "webhookId": "d6bd2c17-9f4b-4997-81b4-649435de2fa9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc5f0c77-a4d9-4708-b22b-3798f8c83bb9",
+              "name": "asset_id",
+              "value": "={{ $json.body.asset_id }}",
+              "type": "string"
+            },
+            {
+              "id": "89e9375b-fe20-46ac-8636-71217c570d90",
+              "name": "timestamp",
+              "value": "={{ $json.body.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "7ea3c743-62e6-493b-ae95-403ff2344e7e",
+              "name": "motor_current_A",
+              "value": "={{ $json.body.motor_current_A }}",
+              "type": "number"
+            },
+            {
+              "id": "a99ec0df-7c00-4183-9e1d-b103d8b5de42",
+              "name": "vibration_g",
+              "value": "={{ $json.body.vibration_g }}",
+              "type": "number"
+            },
+            {
+              "id": "5c670e50-1914-4e78-a584-7f36062cf58f",
+              "name": "temperature_C",
+              "value": "={{ $json.body.temperature_C }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        -160
+      ],
+      "id": "68d6714b-f358-4deb-8c53-8d9edd524d42",
+      "name": "SIMULATED SENSOR DATA"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0303d9a6-8958-459d-832c-619869d2ed0e",
+              "leftValue": "={{ $json.asset_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "70bd0d25-c1ee-4afd-9196-c8d3e0efaa03",
+              "leftValue": "={{ $json.timestamp }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f53e32e6-edb0-4538-a5d4-0c3d02ce8ecd",
+              "leftValue": "={{ $json.motor_current_A }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f1b5bbcd-8504-406c-b905-119048783386",
+              "leftValue": "={{ $json.vibration_g }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3524a440-294b-4a9a-876d-7a0255c55fc1",
+              "leftValue": "={{ $json.temperature_C }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -480,
+        -160
+      ],
+      "id": "581c4c91-c37a-4b19-acd7-400184c8ce77",
+      "name": "Validate Sensor Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ffd9b564-90a4-49b3-bde5-aa8dbc66a736",
+              "leftValue": "={{ $json.fields.riskLevel.stringValue }}",
+              "rightValue": "HIGH",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        -160
+      ],
+      "id": "9d03a556-36ef-44e7-9c02-e260f4dad513",
+      "name": "RISK GATE"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d883c36-c48f-4f87-8d3d-e7524d2e45d3",
+              "name": "alert_type",
+              "value": "CRITICAL_MAINTENANCE",
+              "type": "string"
+            },
+            {
+              "id": "1f06f049-61e1-458a-93ae-82d4bcc3d677",
+              "name": "priority",
+              "value": "HIGH",
+              "type": "string"
+            },
+            {
+              "id": "9f85341c-529c-4691-ad72-fb015d6e55f9",
+              "name": "message",
+              "value": "Point machine PM-001 shows high degradation risk. Immediate maintenance inspection recommended.",
+              "type": "string"
+            },
+            {
+              "id": "c149fdcf-b474-4ac9-b39b-d6f9c1c660a6",
+              "name": "recommended_action",
+              "value": "Inspect point machine motor, gearbox and mechanical linkage.",
+              "type": "string"
+            },
+            {
+              "id": "ba4ed140-5712-4eac-b0a7-c93dc450547e",
+              "name": "maintenance_deadline",
+              "value": "36 hours",
+              "type": "string"
+            },
+            {
+              "id": "05c078f8-2fba-48ca-952d-18eba50f4732",
+              "name": "stationId",
+              "value": "={{ $json.fields.assetId.stringValue }}",
+              "type": "string"
+            },
+            {
+              "id": "cb2915c4-f587-428b-9294-471d46741ab1",
+              "name": "riskLevel",
+              "value": "HIGH",
+              "type": "string"
+            },
+            {
+              "id": "12f13a5a-52da-4d66-9286-95f9e390069a",
+              "name": "anomalyScore",
+              "value": "={{ $json.fields.anomalyScore.integerValue }}",
+              "type": "number"
+            },
+            {
+              "id": "26d7c71f-4f4b-4e35-895b-26b0bb0efa31",
+              "name": "status",
+              "value": "open",
+              "type": "string"
+            },
+            {
+              "id": "6d65225e-225c-4883-9d43-57eedc5c0518",
+              "name": "timestamp",
+              "value": "={{ $json.fields.timestamp.timestampValue }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        -448
+      ],
+      "id": "35d7a6a6-0642-4121-b19a-e24201ffde58",
+      "name": "HIGH RISK ALERT"
+    },
+    {
+      "parameters": {
+        "chatId": "5098260724",
+        "text": "=🚨 *HIGH RISK — ACTION REQUIRED* 🚨\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} — Station {{ $('Prepare ML Score').item.json.stationId }}\n*Risk:* 🔴 HIGH ({{ Number($('Prepare ML Score').item.json.anomalyScore).toFixed(2) }} anomaly / {{ $('Prepare ML Score').item.json.trendRisk.toFixed(2) }} trend)\n*Time to critical:* ~{{ $('Prepare ML Score').item.json.forecastHours }} hrs\n\n{{ $('HIGH RISK ALERT').item.json.message }}\n\n👷 Field engineer has been notified and dispatched.\n_Ticket logged — Rail Sentinel_",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        -544
+      ],
+      "id": "3737adff-bcb2-4517-9274-583840c35a70",
+      "name": "CONTROL ROOM TELEGRAM ALERT",
+      "webhookId": "9c9710e2-c861-4def-ad93-81ceabbbab69",
+      "credentials": {
+        "telegramApi": {
+          "id": "l0XrBmldjJHZDDJ8",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f30846ca-293a-4ff4-aca5-5ed428d75a37",
+              "name": "alert_type",
+              "value": "MAINTENANCE_WARNING",
+              "type": "string"
+            },
+            {
+              "id": "40402993-d389-4403-8bfa-a40543ce48b4",
+              "name": "priority",
+              "value": "MEDIUM",
+              "type": "string"
+            },
+            {
+              "id": "690685e5-df6c-4c42-9004-70120a8a1986",
+              "name": "message",
+              "value": "Point machine PM-001 shows abnormal operating trends. Inspection should be scheduled before the predicted degradation window.",
+              "type": "string"
+            },
+            {
+              "id": "19835ad1-ad24-4204-a35d-6c8b43daf58a",
+              "name": "recommended_action",
+              "value": "Schedule inspection of the point machine motor and mechanical linkage.",
+              "type": "string"
+            },
+            {
+              "id": "ab27085f-8718-46b9-89f9-a0c2cae89d75",
+              "name": "maintenance_deadline",
+              "value": "48 hours",
+              "type": "string"
+            },
+            {
+              "id": "1a375331-9739-403b-a407-76cf2c393c7d",
+              "name": "stationId",
+              "value": "={{ $json.fields.assetId.stringValue }}",
+              "type": "string"
+            },
+            {
+              "id": "f1185f37-ec2f-497c-9605-c85c24b6d218",
+              "name": "riskLevel",
+              "value": "MEDIUM",
+              "type": "string"
+            },
+            {
+              "id": "9b46ef0b-701b-4894-9290-353dfd28f749",
+              "name": "anomalyScore",
+              "value": "={{ $json.fields.anomalyScore.doubleValue }}",
+              "type": "number"
+            },
+            {
+              "id": "026da35a-bc95-4ccb-aaff-eb30e5a9080c",
+              "name": "status",
+              "value": "open",
+              "type": "string"
+            },
+            {
+              "id": "0659a9f0-7d00-4bfa-90da-824b5a7da431",
+              "name": "timestamp",
+              "value": "={{ $json.fields.timestamp.timestampValue }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        -160
+      ],
+      "id": "aef7d287-0c08-4732-ac54-e3c02ca435b6",
+      "name": "MEDIUM RISK ALERT"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96a5ffb9-8431-4efd-a500-f578e0eabd61",
+              "name": "status",
+              "value": "NORMAL_MONITORING",
+              "type": "string"
+            },
+            {
+              "id": "f84aa9dd-d78d-4ca1-986d-a9c0507fb048",
+              "name": "message",
+              "value": "Point machine operating within normal conditions. Continue routine monitoring.",
+              "type": "string"
+            },
+            {
+              "id": "6cacbfec-aa40-4421-aa5f-2f61d7993325",
+              "name": "next_check",
+              "value": "168 hours",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        128
+      ],
+      "id": "3247b64e-d43f-4967-804a-663e9909a03f",
+      "name": "NORMAL MONITORING"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ml-api:8000/predict",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ asset_id: $('Code in JavaScript').item.json.asset_id, timestamp: $('Code in JavaScript').item.json.timestamp, sequence: $('Code in JavaScript').item.json.sequence }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        -160
+      ],
+      "id": "34c0ea02-165c-4525-89d9-677bbf59572d",
+      "name": "PYTHON ML — PREDICT"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n// Build a 12-reading window for the ML model\nconst sequence = Array.from({ length: 12 }, () => ({\n  motor_current_A: item.motor_current_A,\n  vibration_g: item.vibration_g,\n  temperature_C: item.temperature_C,\n}));\nreturn [{\n  json: {\n    // Original information\n    asset_id: item.asset_id,\n    timestamp: item.timestamp,\n    // Fields for Firebase \"readings\"\n    current: item.motor_current_A,\n    stationId: \"station01\",\n    temperature: item.temperature_C,\n    vibration: item.vibration_g,\n    // Data for Python ML\n    sequence: sequence,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        -160
+      ],
+      "id": "3111a110-9ed0-4cb7-b8cb-57c5cf61f987",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "rail-sentinel-e7064",
+        "collection": "readings",
+        "columns": "current,stationId,temperature,timestamp,vibration"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "7d5174ca-301f-48e5-9bd7-f5244d6343dc",
+      "name": "SAVE SENSOR READING",
+      "credentials": {
+        "googleApi": {
+          "id": "RfKzYULmvIkFu7Xt",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "rail-sentinel-e7064",
+        "collection": "scores",
+        "documentId": "=",
+        "columns": "assetId, stationId, isAnomaly, anomalyScore, trendRisk, riskLevel, forecastHours, timestamp, topSensor",
+        "simple": false
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        -160
+      ],
+      "id": "43684009-e085-441a-9ace-423aa40bbe6c",
+      "name": "SAVE ML SCORE",
+      "credentials": {
+        "googleApi": {
+          "id": "RfKzYULmvIkFu7Xt",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "rail-sentinel-e7064",
+        "collection": "tickets",
+        "columns": "alert_type,priority,message,recommended_action,maintenance_deadline,stationId,riskLevel,anomalyScore,status,timestamp"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        -448
+      ],
+      "id": "209847ef-119d-4706-919c-157ee4f52f86",
+      "name": "SAVE HIGH RISK TICKET",
+      "credentials": {
+        "googleApi": {
+          "id": "RfKzYULmvIkFu7Xt",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "rail-sentinel-e7064",
+        "collection": "tickets",
+        "columns": "alert_type,priority,message,recommended_action,maintenance_deadline,stationId,riskLevel,anomalyScore,status,timestamp"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        1536,
+        -160
+      ],
+      "id": "a92691be-06a5-41af-8290-08be81cb786b",
+      "name": "SAVE MEDIUM RISK TICKET",
+      "credentials": {
+        "googleApi": {
+          "id": "RfKzYULmvIkFu7Xt",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst stationId = $('Code in JavaScript').item.json.stationId;\n\n// Find which sensor had the biggest influence on the anomaly score\n// by comparing the absolute value of each SHAP contribution.\nconst shapEntries = Object.entries(item.shap || {});\n\nlet topSensor = null;\nlet topValue = -Infinity;\n\nfor (const [sensorName, contribution] of shapEntries) {\n  const magnitude = Math.abs(contribution);\n  if (magnitude > topValue) {\n    topValue = magnitude;\n    topSensor = sensorName;\n  }\n}\n\nreturn [{\n  json: {\n    assetId: item.asset_id,\n    stationId: stationId,\n    timestamp: item.timestamp,\n    anomalyScore: String(item.anomaly_score),\n    isAnomaly: String(item.is_anomaly),\n    trendRisk: item.trend_risk,\n    riskLevel: item.risk_level,\n    forecastHours: item.forecast_hours,\n    topSensor: topSensor,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -160
+      ],
+      "id": "e66985fb-b2dc-4636-9169-9be52a56b4d7",
+      "name": "Prepare ML Score"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "352d81ae-aee9-4438-b5ae-e1830c14fcf5",
+              "leftValue": "={{ $json.fields.riskLevel.stringValue }}",
+              "rightValue": "MEDIUM",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        32
+      ],
+      "id": "12c1503f-2f71-402c-8f60-8923a7dfd757",
+      "name": "MEDIUM RISK CHECK"
+    },
+    {
+      "parameters": {
+        "chatId": "6963595610",
+        "text": "=🔧 *DISPATCH — HIGH RISK POINT MACHINE* 🔧\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} (Station: {{ $('Prepare ML Score').item.json.stationId }})\n*Detected:* {{ $('Prepare ML Score').item.json.timestamp }}\n\n*Anomaly Score:* {{ Number($('Prepare ML Score').item.json.anomalyScore).toFixed(2) }} / 1.00\n*Trend Risk:* {{ $('Prepare ML Score').item.json.trendRisk.toFixed(2) }} / 1.00\n*Top Contributing Sensor:* {{ $('Prepare ML Score').item.json.topSensor }}\n*Est. Time to Critical:* ~{{ $('Prepare ML Score').item.json.forecastHours }} hours\n\n⚠️ *Issue*\n{{ $('HIGH RISK ALERT').item.json.message }}\n\n🔩 *Required Action*\n{{ $('HIGH RISK ALERT').item.json.recommended_action }}\n\n⏰ *Deadline:* {{ $('HIGH RISK ALERT').item.json.maintenance_deadline }}\n\n_Please confirm receipt and ETA._",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        -352
+      ],
+      "id": "ad3c3dd6-5083-494a-a425-cfa79691a567",
+      "name": "ENGINEER ALERT — HIGH",
+      "webhookId": "5c1c22df-df76-41bd-a5a6-bdf4bdcf83f3",
+      "credentials": {
+        "telegramApi": {
+          "id": "iaabL3rKfGn91sIq",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5098260724",
+        "text": "=🟡 *Maintenance Watch* 🟡\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} — Station {{ $('Prepare ML Score').item.json.stationId }}\n*Risk:* MEDIUM ({{ Number($('Prepare ML Score').item.json.anomalyScore).toFixed(2) }} anomaly)\n\n{{ $('MEDIUM RISK ALERT').item.json.message }}\n\n📅 Inspection scheduled within {{ $('MEDIUM RISK ALERT').item.json.maintenance_deadline }}.\n_No immediate action needed from control room._",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        -256
+      ],
+      "id": "b3bf834c-d4c9-43e1-be52-820afa444fc7",
+      "name": "CONTROL ROOM ALERT — MEDIUM",
+      "webhookId": "54a6ce21-d9cd-40b2-9c21-d573e1b73ea5",
+      "credentials": {
+        "telegramApi": {
+          "id": "l0XrBmldjJHZDDJ8",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6963595610",
+        "text": "=🟡 *SCHEDULE INSPECTION* 🟡\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} (Station: {{ $('Prepare ML Score').item.json.stationId }})\n*Anomaly Score:* {{ Number($('Prepare ML Score').item.json.anomalyScore).toFixed(2) }} / 1.00\n*Trend Risk:* {{ $('Prepare ML Score').item.json.trendRisk.toFixed(2) }} / 1.00\n*Top Contributing Sensor:* {{ $('Prepare ML Score').item.json.topSensor }}\n\n⚠️ {{ $('MEDIUM RISK ALERT').item.json.message }}\n\n🔧 *Action*\n{{ $('MEDIUM RISK ALERT').item.json.recommended_action }}\n\n📅 *Inspection Window:* {{ $('MEDIUM RISK ALERT').item.json.maintenance_deadline }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        -64
+      ],
+      "id": "e9581de4-10fa-482d-8dca-14e649bb290e",
+      "name": "ENGINEER ALERT — MEDIUM",
+      "webhookId": "5c1c22df-df76-41bd-a5a6-bdf4bdcf83f3",
+      "credentials": {
+        "telegramApi": {
+          "id": "iaabL3rKfGn91sIq",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5098260724",
+        "text": "=🟢 *RAIL SENTINEL — NORMAL STATUS* 🟢\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} — Station {{ $('Prepare ML Score').item.json.stationId }}\n*Risk:* 🟢 {{ $('Prepare ML Score').item.json.riskLevel }}\n\n{{ $('NORMAL MONITORING').item.json.message }}\n\n_No action needed. Routine monitoring continues._",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        32
+      ],
+      "id": "025aa7d6-9c94-463b-8c95-a006e865f260",
+      "name": "Control Room",
+      "webhookId": "0d803b6b-5de5-4c68-b0dc-2e765535dfb1",
+      "credentials": {
+        "telegramApi": {
+          "id": "l0XrBmldjJHZDDJ8",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "6963595610",
+        "text": "=🟢 *Point Machine Status Update* 🟢\n\n*Asset:* {{ $('Prepare ML Score').item.json.assetId }} (Station: {{ $('Prepare ML Score').item.json.stationId }})\n*Risk Level:* {{ $('Prepare ML Score').item.json.riskLevel }}\n*Trend Risk:* {{ $('Prepare ML Score').item.json.trendRisk.toFixed(2) }} / 1.00\n*Top Sensor:* {{ $('Prepare ML Score').item.json.topSensor }}\n\n{{ $('NORMAL MONITORING').item.json.message }}\n\n📅 *Next Scheduled Check:* {{ $('NORMAL MONITORING').item.json.next_check }}\n\n_No inspection required at this time._",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        224
+      ],
+      "id": "a7ed0733-7c08-48b2-8f95-448bdbf9003f",
+      "name": "Engineer",
+      "webhookId": "5c1c22df-df76-41bd-a5a6-bdf4bdcf83f3",
+      "credentials": {
+        "telegramApi": {
+          "id": "iaabL3rKfGn91sIq",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "SIMULATED SENSOR DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SIMULATED SENSOR DATA": {
+      "main": [
+        [
+          {
+            "node": "Validate Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RISK GATE": {
+      "main": [
+        [
+          {
+            "node": "HIGH RISK ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MEDIUM RISK CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HIGH RISK ALERT": {
+      "main": [
+        [
+          {
+            "node": "SAVE HIGH RISK TICKET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MEDIUM RISK ALERT": {
+      "main": [
+        [
+          {
+            "node": "SAVE MEDIUM RISK TICKET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NORMAL MONITORING": {
+      "main": [
+        [
+          {
+            "node": "Control Room",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Engineer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PYTHON ML — PREDICT": {
+      "main": [
+        [
+          {
+            "node": "Prepare ML Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "SAVE SENSOR READING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE SENSOR READING": {
+      "main": [
+        [
+          {
+            "node": "PYTHON ML — PREDICT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE ML SCORE": {
+      "main": [
+        [
+          {
+            "node": "RISK GATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE HIGH RISK TICKET": {
+      "main": [
+        [
+          {
+            "node": "ENGINEER ALERT — HIGH",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CONTROL ROOM TELEGRAM ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SAVE MEDIUM RISK TICKET": {
+      "main": [
+        [
+          {
+            "node": "CONTROL ROOM ALERT — MEDIUM",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ENGINEER ALERT — MEDIUM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare ML Score": {
+      "main": [
+        [
+          {
+            "node": "SAVE ML SCORE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONTROL ROOM TELEGRAM ALERT": {
+      "main": [
+        []
+      ]
+    },
+    "MEDIUM RISK CHECK": {
+      "main": [
+        [
+          {
+            "node": "MEDIUM RISK ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NORMAL MONITORING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ENGINEER ALERT — HIGH": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c830c530-0f65-4737-b6c5-3e9e1feb970b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "66bc023970d7c07189a9a15f388a9cfcddbc4a725cbbaa7904a4d22b764bcefa"
+  },
+  "nodeGroups": [],
+  "id": "HiI5eh6tWbhgCNeF",
+  "tags": []
+}
