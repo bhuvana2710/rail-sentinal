@@ -1,8 +1,5 @@
-h# Person 3 — ML, Prediction API & Explainability
+ ML, Prediction API & Explainability
 Railway point-machine predictive maintenance — anomaly detection, degradation trend prediction, and explainability, exposed as an HTTP API for the n8n automation layer.
-
-This README is written for the n8n owner (integration) and for anyone re-running/retraining the ML system. Scope: **only** Person 3's work (Isolation Forest, LSTM, SHAP, FastAPI). Person 1 (hardware) and Person 4 (GenAI explanation) are out of scope and not implemented here.
-
 ---
 
 ## 0. Read this first — data & threshold disclaimers
@@ -363,53 +360,3 @@ Full numbers are written to `models/config.json` after `train.py` runs. Both blo
 > These evaluation results are demonstration results based on synthetic data and are not evidence of production railway safety performance.
 
 ---
-
-# FIVE THINGS I MUST SEND TO THE n8n PERSON
-
-1. **ML API URL:** `https://XXXXXXXX.ngrok-free.app/predict`  ← exact value only known after running Colab Cell 7/8 (or after your `localhost`/Docker deployment is up); insert it here once known.
-2. **HTTP method:** `POST`
-3. **Exact request JSON:**
-   ```json
-   {
-     "asset_id": "PM-001",
-     "timestamp": "2026-08-26T20:10:00+05:30",
-     "sequence": [
-       {"motor_current_A": 1.82, "vibration_g": 0.34, "temperature_C": 34.8},
-       {"motor_current_A": 1.90, "vibration_g": 0.41, "temperature_C": 35.9},
-       {"motor_current_A": 1.95, "vibration_g": 0.47, "temperature_C": 36.7},
-       {"motor_current_A": 2.05, "vibration_g": 0.55, "temperature_C": 38.1},
-       {"motor_current_A": 2.15, "vibration_g": 0.63, "temperature_C": 39.8},
-       {"motor_current_A": 2.28, "vibration_g": 0.72, "temperature_C": 41.5},
-       {"motor_current_A": 2.42, "vibration_g": 0.81, "temperature_C": 43.4},
-       {"motor_current_A": 2.55, "vibration_g": 0.90, "temperature_C": 45.0},
-       {"motor_current_A": 2.68, "vibration_g": 1.00, "temperature_C": 46.6},
-       {"motor_current_A": 2.75, "vibration_g": 1.10, "temperature_C": 47.5},
-       {"motor_current_A": 2.80, "vibration_g": 1.22, "temperature_C": 48.0},
-       {"motor_current_A": 2.85, "vibration_g": 1.35, "temperature_C": 48.9}
-     ]
-   }
-   ```
-   (minimum 12 entries in `sequence`, oldest → newest; more than 12 is accepted, only the most recent 12 are used)
-4. **Exact response JSON:**
-   ```json
-   {
-     "asset_id": "PM-001",
-     "timestamp": "2026-08-26T20:10:00+05:30",
-     "anomaly_score": 0.78,
-     "is_anomaly": true,
-     "trend_risk": 0.81,
-     "risk_level": "HIGH",
-     "forecast_hours": 3.1,
-     "shap": {
-       "motor_current_A": 0.31,
-       "vibration_g": 0.24,
-       "temperature_C": 0.09
-     }
-   }
-   ```
-   (numbers illustrative — schema is fixed; run `test_api.py` against the live URL for real numbers)
-5. **Deployment:** `Colab + ngrok` (recommended for the demo — see `colab_deploy.ipynb`). `localhost` and `Docker` are also fully supported (§8) with no code changes.
-
-**Working sample request:** see §12's `curl` command.
-
-**Working sample response:** see §12's example JSON (or run `python test_api.py <url>` for a real live one).
